@@ -85,11 +85,18 @@ const platformImage = createImage(platform)
 
 const player = new Player()
 const platforms = [new Platform({ x: -1, y: 470, image: platformImage }), new Platform({ x: platformImage.width - 3, y: 470, image: platformImage})]
-const genericObjects = [new GenericObject({
+const genericObjects = [
+  new GenericObject({
   x: -1,
   y: -1,
   image: createImage(background)
-})]
+  }),
+  new GenericObject({
+    x: -1,
+    y: -1,
+    image: createImage(hills)
+    }),
+]
 
 const keys = {
   right: {
@@ -129,11 +136,17 @@ function animate() {
       platforms.forEach(platform => {
         platform.position.x -= 5
       })      
+      genericObjects.forEach(genericObjects => {
+        genericObjects.position.x -= 3
+      })
     } else if (keys.left.pressed) {
       scrollOffset -= 5
       platforms.forEach(platform => {
         platform.position.x += 5
       })      
+      genericObjects.forEach(genericObjects => {
+        genericObjects.position.x += 3
+      })
     }
   }
 
