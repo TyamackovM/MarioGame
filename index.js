@@ -68,6 +68,8 @@ const keys = {
     pressed: false
   }
 }
+//* Считаем значение переменной, до определенной точки "победы"
+let scrollOffset = 0;
 
 function animate() {
   //* Очищает пиксели при движении рекурсивно запуская себя
@@ -86,15 +88,18 @@ function animate() {
     player.velocity.x = 0
 
     if (keys.right.pressed) {
+      scrollOffset += 5
       platforms.forEach(platform => {
         platform.position.x -= 5
       })      
     } else if (keys.left.pressed) {
+      scrollOffset -= 5
       platforms.forEach(platform => {
         platform.position.x += 5
       })      
     }
   }
+
 
   //* Обнаружение платформы
   platforms.forEach(platform => {
@@ -102,6 +107,10 @@ function animate() {
       player.velocity.y = 0
     }
   })  
+
+  if (scrollOffset > 2000) {
+    console.log('you win')
+  }
 }
 
 animate()
