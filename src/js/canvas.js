@@ -112,6 +112,36 @@ class GenericObject {
     c.drawImage(this.image, this.position.x, this.position.y)
   }
 }
+
+class Goomba {
+  constructor({position, velocity}) {
+    this.position = {
+      x: position.x,
+      y: position.y,
+    }
+
+    this.velocity = {
+      x: velocity.x,
+      y: velocity.y
+    }
+
+    this.width = 50
+    this.height = 50
+  }
+
+  draw() {
+    c.fillStyle = 'red'
+    c.fillRect(this.position.x, this.position.y, this.width, this.height)
+  }
+
+  update() {
+    this.draw()
+    this.position.x += this.velocity.x
+    this.position.y += this.velocity.y
+  }
+}
+
+
 //* Функция для определенной картинки
 function createImage(imageSrc) {
   const image = new Image()
@@ -133,15 +163,11 @@ let platformImage
 let platformSmallTallImage
 
 let player = new Player()
-let platforms = [
-]
-
-let genericObjects = [
-  
-]
+let platforms = []
+let genericObjects = []
+let goombas = []
 
 let lastKey
-
 const keys = {
   right: {
     pressed: false
@@ -159,9 +185,21 @@ async function init() {
   platformImage = await createImageAsync(platform)
   platformSmallTallImage = await createImageAsync(platformSmallTall)
 
-  console.log(platformImage.width)  
-
-   player = new Player()
+  player = new Player()
+  
+  goombas = [
+    new Goomba({
+      position: {
+        x: 800, 
+        y: 200
+      },
+      velocity: {
+        x: -0.3,
+        y: 0,
+      }
+    })
+  ]
+  
    platforms = [
     new Platform({
       x: platformImage.width * 4 + 300 - 2 + platformImage.width - platformSmallTallImage.width,
@@ -231,7 +269,12 @@ function animate() {
   platforms.forEach(platform => {
     platform.draw()
   })
+
+  goombas.forEach(goomba => {
+    goomba.update()
+  })
   player.update()
+
 //* Движение игрока
   if (keys.right.pressed && player.position.x < 400) {
     player.velocity.x = player.speed
