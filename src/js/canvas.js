@@ -119,8 +119,18 @@ function createImage(imageSrc) {
   return image
 }
 
-let platformImage = createImage(platform)
-let platformSmallTallImage = createImage(platformSmallTall)
+function createImageAsync(imageSrc) {
+return new Promise((resolve) => {
+  const image = new Image()
+  image.onload = () => {
+    resolve(image)
+  }
+  image.src = imageSrc
+  })
+}
+
+let platformImage
+let platformSmallTallImage
 
 let player = new Player()
 let platforms = [
@@ -144,9 +154,12 @@ const keys = {
 //* Считаем значение переменной, до определенной точки "победы"
 let scrollOffset = 0;
 
-function init() {
+async function init() {
 
-   platformImage = createImage(platform)
+  platformImage = await createImageAsync(platform)
+  platformSmallTallImage = await createImageAsync(platformSmallTall)
+
+  console.log(platformImage.width)  
 
    player = new Player()
    platforms = [
@@ -275,7 +288,7 @@ function animate() {
   }
 
   // * Условие победы
-  if (scrollOffset > platformImage.width * 5 + 300 - 2) {
+  if (platformImage && scrollOffset > platformImage.width * 5 + 300 - 2) {
     console.log('you win')
   }
 
