@@ -138,7 +138,12 @@ class Goomba {
     this.draw()
     this.position.x += this.velocity.x
     this.position.y += this.velocity.y
+
+    if (this.position.y + this.height + this.velocity.y <= canvas.height ) {
+      this.velocity.y += gravity
+    }
   }
+  
 }
 
 
@@ -179,6 +184,25 @@ const keys = {
 
 //* Считаем значение переменной, до определенной точки "победы"
 let scrollOffset = 0;
+
+//*Функия гравитации для игрока и врагов
+function isOnTopOfPlatform ({object, platform}) {
+  return ( 
+    object.position.y + object.height <= platform.position.y && 
+    object.position.y + object.height + object.velocity.y >= platform.position.y && 
+    object.position.x + object.width >= platform.position.x && 
+    object.position.x <= platform.position.x + platform.width 
+  )        
+}
+//* Функция обнаружения врага
+function collisionTop ({object1, object2}) {
+  return ( 
+    object1.position.y + object1.height <= object2.position.y && 
+    object1.position.y + object1.height + object1.velocity.y >= object2.position.y && 
+    object1.position.x + object1.width >= object2.position.x && 
+    object1.position.x <= object2.position.x + object2.width 
+  )        
+}
 
 async function init() {
 
@@ -270,8 +294,19 @@ function animate() {
     platform.draw()
   })
 
-  goombas.forEach(goomba => {
+  goombas.forEach((goomba, index) => {
     goomba.update()
+
+    if (collisionTop({object1: player, object2: goomba})) {
+      player.velocity.y -=40
+      setTimeout(() => {
+        goombas.splice(index, 1)
+      }, 0)
+    } else if (player.position.x + player.width >= goomba.position.x && 
+      player.position.y + player.height >= goomba.position.y &&
+      player.position.x <= goomba.position.x + goomba.width) {
+      init()
+    }
   })
   player.update()
 
@@ -282,7 +317,7 @@ function animate() {
     player.velocity.x = -player.speed
   } else {
     player.velocity.x = 0
-//* Позиции платформы при движении игрока и обьектов бэкграунда(паралакс эффект)
+//* Позиции платформы при движении игрока и обьектов бэкграунда(паралакс эффект && скролл)
     if (keys.right.pressed) {
       scrollOffset += player.speed
       platforms.forEach(platform => {
@@ -290,6 +325,9 @@ function animate() {
       })      
       genericObjects.forEach(genericObjects => {
         genericObjects.position.x -= player.speed * 0.66
+      })
+      goombas.forEach(goomba => {
+        goomba.position.x -= player.speed
       })
     } else if (keys.left.pressed && scrollOffset > 0) { //* Запрет на выход за зону
       scrollOffset -= player.speed
@@ -299,15 +337,25 @@ function animate() {
       genericObjects.forEach(genericObjects => {
         genericObjects.position.x += player.speed * 0.66
       })
+      goombas.forEach(goomba => {
+        goomba.position.x += player.speed
+      })
     }
   }
 
 
   //* Обнаружение платформы
   platforms.forEach(platform => {
-    if (player.position.y + player.height <= platform.position.y && player.position.y + player.height + player.velocity.y >= platform.position.y && player.position.x + player.width >= platform.position.x && player.position.x <= platform.position.x + platform.width) {
+    if (
+      isOnTopOfPlatform({object: player, platform})
+    ) {
       player.velocity.y = 0
     }
+
+    goombas.forEach(goomba => {
+      if (isOnTopOfPlatform({object: goomba, platform})) goomba.velocity.y = 0
+    })
+    // if ()
   })  
 
   //* Переключение спрайтов персонажа
