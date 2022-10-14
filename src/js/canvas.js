@@ -116,7 +116,7 @@ class GenericObject {
 }
 
 class Goomba {
-  constructor({position, velocity}) {
+  constructor({position, velocity, distance = {limit: 50, traveled: 0}}) {
     this.position = {
       x: position.x,
       y: position.y,
@@ -132,6 +132,8 @@ class Goomba {
 
     this.image = createImage(spriteGoomba)
     this.frames = 0
+
+    this.distance = distance
   }
 
   draw() {
@@ -159,6 +161,12 @@ class Goomba {
 
     if (this.position.y + this.height + this.velocity.y <= canvas.height ) {
       this.velocity.y += gravity
+    }
+    //* Перемещение врага
+    this.distance.traveled += Math.abs(this.velocity.x)
+    if (this.distance.traveled > this.distance.limit) {
+      this.distance.traveled = 0
+      this.velocity.x = -this.velocity.x
     }
   }
   
@@ -284,8 +292,22 @@ async function init() {
       velocity: {
         x: -0.3,
         y: 0,
+      },
+      distance: {
+        limit: 200,
+        traveled: 0
       }
-    })
+    }),
+    new Goomba({
+      position: {
+        x: 1400, 
+        y: 100
+      },
+      velocity: {
+        x: -0.3,
+        y: 0,
+      }
+    }),
   ]
 
   particles = []
